@@ -2,18 +2,18 @@
 A guide for secure your linux server!
 
 ## Index:
-- [1. SSH & Authentication](#ssh-&-authentication)
+- [1. SSH & Authentication](#1.-ssh-&-authentication)
   - [What is SSH?](#what-is-ssh?)
   - [The SSH port](#the-ssh-port?)
-- [2. Firewall Basics](#firewall-basics)
+- [2. Firewall Basics](#2.-firewall-basics)
   - [Block a specific Port](#block-a-specific-port)
-- [3. Firewall Tooltips](#firewall-tooltips)
+- [3. Firewall Tooltips](#3.-firewall-tooltips)
   - [Block Port Scans](#block-port-scans)
   - [Block ICMP Requests](#block-icmp-requests)
   - [Bruteforce - Limit ssh connections](#Bruteforce---Limit-ssh-connections)
 
 
-## SSH & Authentication
+## 1. SSH & Authentication
 ### What is SSH?
 SSH is the name of a protocol and the program that implements it whose main function is remote access to a server through a secure channel in which all information is encrypted.  
 
@@ -36,6 +36,47 @@ service sshd restart
 ``` 
 
 ## 2. Firewall Basics
+### Block a specific Port
+to block a specific port for external access we will use the following iptables rule:  
+```bash
+iptables -A INPUT -p tcp --dport PORT_NUMBER_HERE -j DROP
+```
+
+### Allow a specific Port
+to allow again a blockedd specific port for external access we will use the following iptables rule:  
+```bash
+iptables -A INPUT -p tcp --dport PORT_NUMBER_HERE -j ACCEPT
+```
+
+### Block a specific IP Address
+to block a specific IP Address for external access we will use the following iptables rule: 
+```bash
+iptables -A INPUT -s IP_ADDRESS_HERE -j DROP
+```
+### Allow a specific IP Address
+to allow again a blocked specific IP Address for external access we will use the following iptables rule: 
+```bash
+iptables -A INPUT -s IP_ADDRESS_HERE -j ACCEPT
+```
+
+### Block all ports for any IP
+If we want to block all ports for external use, use the following command:  
+```bash
+iptables -P INPUT DROP
+iptables -A INPUT -j REJECT
+```
+
+don't forget to allow outgoing traffic:
+```bash
+iptables -A OUTPUT -j ACCEPT
+iptables -A OUTPUT -o lo -j ACCEPT
+```
+
+and allow the ports you want to open (ssh/22 port and web/80 port in most cases)
+```bash
+iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+```
 
 ## 3. Firewall Tooltips
 ### Block Port Scans
