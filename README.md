@@ -5,9 +5,12 @@ A guide for secure your linux server!
 - [1. SSH & Authentication](#ssh-&-authentication)
   - [What is SSH?](#what-is-ssh?)
   - [The SSH port](#the-ssh-port?)
-  - [Bruteforce - Limit ssh connections](#Bruteforce---Limit-ssh-connections)
-- [2. Ports and services](#ports-&-services)
+- [2. Firewall Basics](#firewall-basics)
+  - [Block a specific Port](#block-a-specific-port)
+- [3. Firewall Tooltips](#firewall-tooltips)
   - [Block Port Scans](#block-port-scans)
+  - [Block ICMP Requests](#block-icmp-requests)
+  - [Bruteforce - Limit ssh connections](#Bruteforce---Limit-ssh-connections)
 
 
 ## SSH & Authentication
@@ -30,24 +33,11 @@ This command will open the file `/etc/ssh/sshd_config` which contains the parame
 then we will restart the SSH service using:  
 ```bash
 service sshd restart
-```
+``` 
 
-### Bruteforce - Limit ssh connections
-Remember that if you have a firewall service, you will not be able to access it again if you do not open the new port that you will place instead of 22.  
+## 2. Firewall Basics
 
-There is a password attack called "Brute Force", this coincides in making multiple password attempts until you find the correct one.  
-To block this we can configure our server to allow only one connection every one minute from an IP address. 
-
-Having iptables installed and ready to use, we will write to the terminal:
-```bash
-iptables -I INPUT -p tcp --dport 22 -i eth0 -m state --state NEW -m recent --set
-iptables -I INPUT -p tcp --dport 22 -i eth0 -m state --state NEW -m recent --update --seconds 60 --hitcount 2 -j DROP
-```
-
-If you have changed the SSH port that comes by default, you must change the parameter "22" in the command.  
-You can also change the time that must pass between connection from the same ip, the default parameter is 60 seconds.  
-
-## Ports & Services
+## 3. Firewall Tooltips
 ### Block Port Scans
 It is important if we have services with public ports on our server to block network scans to prevent intruders from knowing where to attack.  
 
@@ -93,3 +83,24 @@ from 23 to 79 will be blocked (leaving 80 free)
 and finally from 3007 to 65535 they will be blocked.  
 
 (port 65535 is the last)  
+
+### Block ICMP Packets
+icmp packets can cause instability to the server on a large scale, and it is an unnecessary use of resources, we can disable our server to respond to these requests using the following command:  
+```bash
+sudo iptables -A INPUT -p icmp --icmp-type echo-request -j REJECT
+```
+
+### Bruteforce - Limit ssh connections
+Remember that if you have a firewall service, you will not be able to access it again if you do not open the new port that you will place instead of 22.  
+
+There is a password attack called "Brute Force", this coincides in making multiple password attempts until you find the correct one.  
+To block this we can configure our server to allow only one connection every one minute from an IP address. 
+
+Having iptables installed and ready to use, we will write to the terminal:
+```bash
+iptables -I INPUT -p tcp --dport 22 -i eth0 -m state --state NEW -m recent --set
+iptables -I INPUT -p tcp --dport 22 -i eth0 -m state --state NEW -m recent --update --seconds 60 --hitcount 2 -j DROP
+```
+
+If you have changed the SSH port that comes by default, you must change the parameter "22" in the command.  
+You can also change the time that must pass between connection from the same ip, the default parameter is 60 seconds. 
