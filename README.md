@@ -2,10 +2,12 @@
 A guide for secure your linux server!
 
 ## Index:
-- [1. SSH & Authentication+](#ssh-&-authentication)
+- [1. SSH & Authentication](#ssh-&-authentication)
   - [What is SSH?](#what-is-ssh?)
   - [The SSH port](#the-ssh-port?)
   - [Bruteforce - Limit ssh connections](#Bruteforce---Limit-ssh-connections)
+- [2. Ports and services](#ports-&-services)
+  - [Block Port Scans](#block-port-scans)
 
 
 ## SSH & Authentication
@@ -44,3 +46,50 @@ iptables -I INPUT -p tcp --dport 22 -i eth0 -m state --state NEW -m recent --upd
 
 If you have changed the SSH port that comes by default, you must change the parameter "22" in the command.  
 You can also change the time that must pass between connection from the same ip, the default parameter is 60 seconds.  
+
+## Ports & Services
+### Block Port Scans
+It is important if we have services with public ports on our server to block network scans to prevent intruders from knowing where to attack.  
+
+For this we will install a tool that will help us to falsify ports and we will install it as follows.
+```bash
+# If we do not have git installed, we will install it:
+apt install git
+
+# then we will clone the repository using:
+git clone https://github.com/drk1wi/portspoof.git
+cd portspoof
+
+# and we will install the program as follows:
+./configure && make && sudo make install
+portspoof -c portspoof.conf -s portspoof_signatures -D
+```
+
+Finally, we must specify which ports we do not want to be redirected and which do.  
+For this we will use the following command:
+```bash
+iptables -t nat -A PREROUTING -i venet0 -p tcp -m tcp -m multiport --dports 1:3305,3307:25567,25600:49999,50001:65535 -j REDIRECT --to-ports 4444
+```
+
+Here is a brief explanation:  
+Suppose I want to block all ports except 22.  
+Then the range of ports would be like this:  
+1: 21.23: 65535  
+
+Now suppose I want to block all ports except 22 and 80, then the range of ports would look like this:  
+1: 21.23: 79.81: 65535  
+
+Now as a last example, suppose I want to block all ports except 22, 80 and 3306, so the range of ports would look like this:  
+1: 21.23: 79.81: 3305,3307: 65535  
+
+it is understood?  
+Basically in the following operation:  
+1: 21.23: 79.81: 3305,3307: 65535  
+
+We specify that:  
+from 1 to 21 will be blocked (leaving 22 free)  
+from 23 to 79 will be blocked (leaving 80 free)  
+81 to 3305 will be blocked (leaving 3306 free)  
+and finally from 3007 to 65535 they will be blocked.  
+
+(port 65535 is the last)  
