@@ -68,7 +68,7 @@ portspoof -c portspoof.conf -s portspoof_signatures -D
 Finally, we must specify which ports we do not want to be redirected and which do.  
 For this we will use the following command:
 ```bash
-iptables -t nat -A PREROUTING -i venet0 -p tcp -m tcp -m multiport --dports 1:3305,3307:25567,25600:49999,50001:65535 -j REDIRECT --to-ports 4444
+iptables -t nat -A PREROUTING -i venet0 -p tcp -m tcp -m multiport --dports INSERT:PORT,RANGE:HERE -j REDIRECT --to-ports 4444
 ```
 
 Here is a brief explanation:  
