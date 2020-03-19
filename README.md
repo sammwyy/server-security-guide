@@ -95,6 +95,10 @@ apt install git
 git clone https://github.com/drk1wi/portspoof.git
 cd portspoof
 
+# Install make and g++
+apt install make
+apt install g++
+
 # and we will install the program as follows:
 ./configure && make && sudo make install
 portspoof -c portspoof.conf -s portspoof_signatures -D
@@ -103,7 +107,7 @@ portspoof -c portspoof.conf -s portspoof_signatures -D
 Finally, we must specify which ports we do not want to be redirected and which do.  
 For this we will use the following command:
 ```bash
-iptables -t nat -A PREROUTING -i venet0 -p tcp -m tcp -m multiport --dports INSERT:PORT,RANGE:HERE -j REDIRECT --to-ports 4444
+iptables -t nat -A PREROUTING -i eth0 -p tcp -m tcp -m multiport --dports INSERT:PORT,RANGE:HERE -j REDIRECT --to-ports 4444
 ```
 
 Here is a brief explanation:  
