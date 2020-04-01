@@ -95,8 +95,10 @@ apt install git
 git clone https://github.com/drk1wi/portspoof.git
 cd portspoof
 
-# Install make and g++
+# Install make
 apt install make
+
+# Install g++
 apt install g++
 
 # and we will install the program as follows:
@@ -109,21 +111,22 @@ For this we will use the following command:
 ```bash
 iptables -t nat -A PREROUTING -i eth0 -p tcp -m tcp -m multiport --dports INSERT:PORT,RANGE:HERE -j REDIRECT --to-ports 4444
 ```
+Change eth0 by your network adapter name.  
 
 Here is a brief explanation:  
 Suppose I want to block all ports except 22.  
 Then the range of ports would be like this:  
-1: 21.23: 65535  
+1: 21,23: 65535  
 
 Now suppose I want to block all ports except 22 and 80, then the range of ports would look like this:  
-1: 21.23: 79.81: 65535  
+1: 21,23: 79,81: 65535  
 
 Now as a last example, suppose I want to block all ports except 22, 80 and 3306, so the range of ports would look like this:  
-1: 21.23: 79.81: 3305,3307: 65535  
+1: 21,23: 79,81: 3305,3307: 65535  
 
 it is understood?  
 Basically in the following operation:  
-1: 21.23: 79.81: 3305,3307: 65535  
+1: 21,23: 79,81: 3305,3307: 65535  
 
 We specify that:  
 from 1 to 21 will be blocked (leaving 22 free)  
@@ -132,6 +135,7 @@ from 23 to 79 will be blocked (leaving 80 free)
 and finally from 3007 to 65535 they will be blocked.  
 
 (port 65535 is the last)  
+Beware: remove space in examples.  
 
 ### Block ICMP Packets
 icmp packets can cause instability to the server on a large scale, and it is an unnecessary use of resources, we can disable our server to respond to these requests using the following command:  
